@@ -18,36 +18,39 @@ void CalcCoefA(vector<double> vx, vector<double> vy, int n, double &coefA);
 //主函数，这里将数据拟合成二次曲线
 int main(int argc, char* argv[])
 {
-//    double arry1[5]={0,0.25,0,5,0.75};
-//    double arry2[5]={1,1.283,1.649,2.212,2.178};
     FILE* fp=nullptr;
 	fp=fopen("data.txt","rb+");
-	double arry1[5],arry2[5];
-    for(int i=0;i<5;i++){
-	    fscanf(fp,"%lf %lf",&arry1[i],&arry2[i]);
-	}
-//    double arry1[5]={1,2,3,4,5};
-//    double arry2[5]={={1,2,3,4,10};
+	double arry1[5],arry2[5],arry3[100],arry4[100];
 	double coefficient[5];
     memset(coefficient,0,sizeof(double)*5);
     vector<double> vx,vy;
-    for (int i=0; i<5; i++)
-    {
+    for(int i=0;i<5;i++){
+	    fscanf(fp,"%lf %lf",&arry1[i],&arry2[i]);
         vx.push_back(arry1[i]);
         vy.push_back(arry2[i]);
-    }
-    EMatrix(vx,vy,5,3,coefficient);
-    printf("拟合方程为：y = %lf + %lfx + %lfx^2 \n",coefficient[1],coefficient[2],coefficient[3]);
+	}
+    EMatrix(vx,vy,vx.size(),3,coefficient);
+    printf("Quadratic Fitting: y = %lf + %lfx + %lfx^2 \n",coefficient[1],coefficient[2],coefficient[3]);
 	double coefA;
 	CalcCoefA(vx,vy,vx.size(),coefA);
-    printf("拟合方程为：y = %lfx \n",coefA);
+    printf("Linear Fitting: y = %lfx \n",coefA);
+
+    FILE* fp_write=nullptr;
+    fp_write=fopen("data_result.txt","w+");
+	for(int i=0;i<100;i++){
+	    arry3[i] = coefficient[1]+coefficient[2]*i/20+coefficient[3]*i*i/20/20;
+        arry4[i] = coefA*i/20;
+        fprintf(fp_write,"%lf %lf %lf\n",double(i)/20,arry3[i],arry4[i]);
+    }
+
+    fclose(fp);
+	fclose(fp_write);
     return 0;
 }
 //一次项拟合
 void CalcCoefA(vector<double> vx, vector<double> vy, int n, double &coefA)
 {
     coefA=MutilSum(vx,vy,vx.size())/RelatePow(vx,vx.size(),2);
-    printf("coefA=%lf\n",coefA);
 }
 //累加
 double sum(vector<double> Vnum, int n)
@@ -100,7 +103,15 @@ void EMatrix(vector<double> Vx, vector<double> Vy, int n, int ex, double coeffic
         }
         Em[i][ex+1]=RelateMutiXY(Vx,Vy,n,i-1);
     }
+   
     Em[1][1]=n;
+//	if(ex<3){
+//	    for(int i=1;i<=ex;i++){
+//		    for(int j=1;j<=ex;j++){
+//			if(i!=2&&j!=2)Em[i][j]=0;}
+//		}
+//
+//	} 
     CalEquation(ex,coefficient);
 }
 //求解方程
