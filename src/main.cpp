@@ -24,11 +24,13 @@ int main(int argc, char* argv[])
 	double coefficient[5];
     memset(coefficient,0,sizeof(double)*5);
     vector<double> vx,vy;
+
     for(int i=0;i<5;i++){
 	    fscanf(fp,"%lf %lf",&arry1[i],&arry2[i]);
         vx.push_back(arry1[i]);
         vy.push_back(arry2[i]);
 	}
+
     EMatrix(vx,vy,vx.size(),3,coefficient);
     printf("Quadratic Fitting: y = %lf + %lfx + %lfx^2 \n",coefficient[1],coefficient[2],coefficient[3]);
 	double coefA;
